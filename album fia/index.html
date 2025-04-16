@@ -281,7 +281,6 @@
             color: #ff66b2;
         }
 
-        /* Floating characters */
         .character {
             position: absolute;
             z-index: 0;
@@ -317,6 +316,51 @@
             right: 10%;
             animation: float 7s ease-in-out infinite 1.5s;
         }
+        
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            background-color: #ffcce6;
+            border-radius: 50px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 15px rgba(255, 102, 178, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .music-player:hover {
+            transform: scale(1.05);
+        }
+        
+        .play-btn {
+            background-color: #ff66b2;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-right: 10px;
+            box-shadow: 0 3px 10px rgba(255, 102, 178, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .play-btn:hover {
+            background-color: #ff1493;
+            transform: scale(1.1);
+        }
+        
+        .music-title {
+            color: #ff1493;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -329,11 +373,10 @@
         <p class="subtitle">Photo Album</p>
     </div>
 
-    <div class="container"> x
+    <div class="container">
         <button class="add-btn" id="addPhotoBtn">+ Add New Memory</button>
         
         <div class="photo-grid" id="photoGrid">
-            <!-- Sample photos - replace with your own photos -->
             <div class="photo-frame">
                 <img src="1.jpg" alt="Fave pic">
                 <div class="photo-caption">Fave pic</div>
@@ -372,7 +415,6 @@
         </div>
     </div>
 
-    <!-- Decorative elements -->
     <div class="decoration heart" style="top: 20%; left: 10%;">♥</div>
     <div class="decoration star" style="top: 15%; right: 15%;">★</div>
     <div class="decoration heart" style="bottom: 20%; right: 10%;">♥</div>
@@ -380,7 +422,6 @@
     <div class="decoration star" style="top: 40%; left: 30%;">★</div>
     <div class="decoration heart" style="top: 50%; right: 25%;">♥</div>
 
-    <!-- Sanrio-style character images -->
     <div class="character character1">
         <img src="gif 1.gif" alt="Cute character">
     </div>
@@ -394,7 +435,12 @@
         <img src="gif 4.gif" alt="Cute character">
     </div>
 
-    <!-- Modal for viewing photos -->
+    <div class="music-player">
+        <button class="play-btn" id="playBtn">▶</button>
+        <span class="music-title">Background Music</span>
+        <audio id="bgMusic" src="music.mp3" loop></audio>
+    </div>
+
     <div class="modal" id="photoModal">
         <div class="modal-content">
             <span class="close-modal" id="closeModal">×</span>
@@ -404,7 +450,6 @@
         </div>
     </div>
 
-    <!-- Modal for adding new photos -->
     <div class="add-photo-modal" id="addPhotoModal">
         <div class="add-photo-content">
             <h2 style="text-align: center; color: #ff66b2;">Add New Memory</h2>
@@ -442,8 +487,10 @@
             const addPhotoForm = document.getElementById('addPhotoForm');
             const cancelAddPhoto = document.getElementById('cancelAddPhoto');
             const photoGrid = document.getElementById('photoGrid');
+            const playBtn = document.getElementById('playBtn');
+            const bgMusic = document.getElementById('bgMusic');
+            let isPlaying = false;
             
-            // Add click event to all photo frames
             photoFrames.forEach(frame => {
                 frame.addEventListener('click', function() {
                     const img = this.querySelector('img');
@@ -455,7 +502,6 @@
                     modalDate.textContent = date;
                     modal.style.display = 'flex';
                     
-                    // Add animation to modal opening
                     modal.animate(
                         [
                             { opacity: 0, transform: 'scale(0.9)' },
@@ -466,7 +512,6 @@
                 });
             });
             
-            // Close modal when clicking X
             closeModal.addEventListener('click', function() {
                 modal.animate(
                     [
@@ -479,14 +524,12 @@
                 };
             });
             
-            // Close modal when clicking outside
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
                     closeModal.click();
                 }
             });
             
-            // Open add photo modal
             addPhotoBtn.addEventListener('click', function() {
                 addPhotoModal.style.display = 'flex';
                 addPhotoModal.animate(
@@ -498,7 +541,6 @@
                 );
             });
             
-            // Cancel add photo
             cancelAddPhoto.addEventListener('click', function() {
                 addPhotoModal.animate(
                     [
@@ -512,14 +554,12 @@
                 };
             });
             
-            // Close add photo modal when clicking outside
             addPhotoModal.addEventListener('click', function(e) {
                 if (e.target === addPhotoModal) {
                     cancelAddPhoto.click();
                 }
             });
             
-            // Add new photo
             addPhotoForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
@@ -527,14 +567,12 @@
                 const photoCaption = document.getElementById('photoCaption').value;
                 const photoDate = document.getElementById('photoDate').value;
                 
-                // Format the date nicely
                 const formattedDate = new Date(photoDate).toLocaleDateString('en-US', {
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric'
                 });
                 
-                // Create new photo frame
                 const newPhotoFrame = document.createElement('div');
                 newPhotoFrame.className = 'photo-frame';
                 newPhotoFrame.innerHTML = `
@@ -543,7 +581,6 @@
                     <div class="photo-date">${formattedDate}</div>
                 `;
                 
-                // Add click event to the new photo
                 newPhotoFrame.addEventListener('click', function() {
                     const img = this.querySelector('img');
                     const caption = this.querySelector('.photo-caption').textContent;
@@ -555,7 +592,6 @@
                     modal.style.display = 'flex';
                 });
                 
-                // Add the new photo to the grid with animation
                 photoGrid.prepend(newPhotoFrame);
                 newPhotoFrame.animate(
                     [
@@ -565,11 +601,9 @@
                     { duration: 500, easing: 'ease-out' }
                 );
                 
-                // Close the modal and reset form
                 cancelAddPhoto.click();
             });
             
-            // Create floating hearts animation
             function createFloatingHearts() {
                 const container = document.querySelector('.container');
                 const heart = document.createElement('div');
@@ -583,7 +617,6 @@
                 heart.style.pointerEvents = 'none';
                 container.appendChild(heart);
                 
-                // Animate the heart
                 const animation = heart.animate(
                     [
                         { transform: 'translateY(0) rotate(0)', opacity: 0.8 },
@@ -600,15 +633,12 @@
                 };
             }
             
-            // Create floating hearts at random intervals
             setInterval(createFloatingHearts, 800);
             
-            // Initial hearts
             for (let i = 0; i < 10; i++) {
                 setTimeout(createFloatingHearts, i * 300);
             }
             
-            // Add sparkles to title on hover
             const title = document.querySelector('h1');
             title.addEventListener('mouseover', function() {
                 const sparkleCount = 15;
@@ -639,6 +669,26 @@
                         };
                     }, i * 100);
                 }
+            });
+            
+            playBtn.addEventListener('click', function() {
+                if (isPlaying) {
+                    bgMusic.pause();
+                    playBtn.innerHTML = '▶';
+                } else {
+                    bgMusic.play();
+                    playBtn.innerHTML = '❚❚';
+                }
+                isPlaying = !isPlaying;
+                
+                playBtn.animate(
+                    [
+                        { transform: 'scale(0.8)' },
+                        { transform: 'scale(1.2)' },
+                        { transform: 'scale(1)' }
+                    ],
+                    { duration: 300, easing: 'ease-out' }
+                );
             });
         });
     </script>
